@@ -1,4 +1,4 @@
-# PH_PHIBL_PresetLoad
+# PH_PHIBL_PresetLoad (IPA)
 
 This plugin loads your selected PHIBL settings in the main game for you.  
 
