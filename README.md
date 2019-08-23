@@ -8,7 +8,7 @@ This plugin loads your selected PHIBL settings in the main game for you.
 **Configuration**  
 * Go in the studio, configure your PHIBL to the settings you want, save the scene.  
 * Go in `UserData/studio/scene` and rename the created `name.png.extdata` to `default_PHIBL_maingame.extdata`.  
-* Place the renamed file into `UserData/`  
+* Place the renamed file into `UserData/`.  
 * Playing the main game should load the file automatically. If it's missing - it won't be loaded.  
 
 **Notes**  
