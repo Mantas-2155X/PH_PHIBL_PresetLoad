@@ -10,9 +10,6 @@ This plugin loads your selected PHIBL settings in the main game for you.
 * Go in `UserData/` and rename the created `temp_PHIBL_MainGame.extdata` to `PHIBL_MainGame.extdata`.  
 * Playing the main game should load the file automatically. If it's missing - it won't be loaded.  
 
-**Notes**  
-* Not all settings are currently saved, but most are. I will finish the rest when I get more time.  
-
 **Coming soon**  
 * Saving missing settings.  
 
