@@ -3,10 +3,8 @@
 This plugin loads your selected PHIBL settings in the main game for you.  
 
 **Installation**  
-If your PHIBL is the nyaacho custom build:  
-* Drop the PH_PHIBL_PresetLoad_Nyaacho.dll in `Plugins/`.  
-If your PHIBL is the the original build:  
-* Drop the PH_PHIBL_PresetLoad_Original.dll in `Plugins/`.  
+* If your PHIBL is the nyaacho custom build:  Drop the PH_PHIBL_PresetLoad_Nyaacho.dll in `Plugins/`.  
+* If your PHIBL is the the original build:  Drop the PH_PHIBL_PresetLoad_Original.dll in `Plugins/`.  
 * Make sure to remove old one if it's there!  
 
 
