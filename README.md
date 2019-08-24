@@ -15,7 +15,7 @@ This plugin loads your selected PHIBL settings in the main game for you.
 * Not all settings are currently saved, but most are. I will finish the rest when I get more time.  
 
 **Coming soon**  
-* Saving LUT settings, other missing settings.  
+* Saving missing settings.  
 
 **Currently not saved (wait for next release)**  
 * Misc -> Global Settings -> Screen Shot Size ✕  
