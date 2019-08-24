@@ -23,4 +23,4 @@ This plugin loads your selected PHIBL settings in the main game for you.
 * Misc -> Global Settings -> Shadow Distance ✓  
 * Misc -> Global Settings -> Screen Shot Size  
 * Perception -> LUT  
-* Lightning -> Reflection  
+* Lightning -> Reflection -> Refresh Rate  
