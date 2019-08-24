@@ -18,9 +18,9 @@ This plugin loads your selected PHIBL settings in the main game for you.
 * Saving LUT settings, other missing settings.  
 
 **Currently not saved (wait for next release)**  
-* Misc -> Nipples ✕  
+* Misc -> Nipples ✓  
 * Misc -> Tessellation ✓  
-* Misc -> Global Settings -> Shadow Distance  
+* Misc -> Global Settings -> Shadow Distance ✓  
 * Misc -> Global Settings -> Screen Shot Size  
 * Perception -> LUT  
 * Lightning -> Reflection  
