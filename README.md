@@ -2,6 +2,9 @@
 
 This plugin loads your selected PHIBL settings in the main game for you.  
 
+**Download**  
+* Get the latest release from https://github.com/Mantas-2155X/PH_PHIBL_PresetLoad/releases  
+
 **Installation**  
 * If your PHIBL is the nyaacho custom build:  Drop the `PH_PHIBL_PresetLoad_Nyaacho.dll` in `Plugins/`.  
 * If your PHIBL is the the original build:  Drop the `PH_PHIBL_PresetLoad_Original.dll` in `Plugins/`.  
