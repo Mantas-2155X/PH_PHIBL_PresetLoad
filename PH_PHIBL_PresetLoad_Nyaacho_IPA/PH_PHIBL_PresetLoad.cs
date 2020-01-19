@@ -33,7 +33,7 @@ namespace PH_PHIBL_PresetLoad
     public class IPA_PHIBL_PresetLoad : IPlugin
     {
         public string Name => "PHIBL Preset Load (IPA, for Nyaacho custom PHIBL)";
-        public string Version => "1.2.0";
+        public string Version => "1.2.1";
         
         private const KeyCode saveKey = KeyCode.S;
         private const KeyCode loadKey = KeyCode.L;
@@ -68,6 +68,10 @@ namespace PH_PHIBL_PresetLoad
         }
         
         public void OnLevelWasLoaded(int level) {
+            phIBL = phIBL != null ? phIBL : UnityEngine.Object.FindObjectOfType<PHIBL.PHIBL>();
+            if (phIBL == null) 
+                return;
+            
             string sceneName = SceneManager.GetActiveScene().name;
             
             if (!activeScenes.Contains(sceneName)) 
@@ -78,8 +82,7 @@ namespace PH_PHIBL_PresetLoad
 
         private static void LoadSettings()
         {
-            phIBL = phIBL != null ? phIBL : UnityEngine.Object.FindObjectOfType<PHIBL.PHIBL>();
-            if (phIBL == null) 
+            if (phIBL == null)
                 return;
 
             FileInfo file = new FileInfo(@"UserData/PHIBL_MainGame.extdata");
@@ -94,8 +97,7 @@ namespace PH_PHIBL_PresetLoad
         
         private static void SaveSettings()
         {
-            phIBL = phIBL != null ? phIBL : UnityEngine.Object.FindObjectOfType<PHIBL.PHIBL>();
-            if (phIBL == null) 
+            if (phIBL == null)
                 return;
 
             Traverse trav = Traverse.Create(phIBL);
