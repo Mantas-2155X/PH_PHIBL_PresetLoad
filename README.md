@@ -1,8 +1,8 @@
 # PH_PHIBL_PresetLoad (IPA)
 
-This plugin loads your selected PHIBL settings in the main game(1) for you.  
+This plugin loads your selected PHIBL settings in the game for you.  
 
-(1) [V1.2.1] You're now able to load/save presets in the studio by using the hotkeys `RightCTRL+S` & `RightCTRL+L`.
+If you're updating from a previous version (<2.0.0), to load your old preset file, refer to the **Loading legacy presets** of this readme.  
 
 **Download**  
 * Get the latest release from https://github.com/Mantas-2155X/PH_PHIBL_PresetLoad/releases  
@@ -12,11 +12,26 @@ This plugin loads your selected PHIBL settings in the main game(1) for you.
 * If your PHIBL is the the original build:  Drop the `PH_PHIBL_PresetLoad_Original.dll` in `Plugins/`.  
 * Make sure to remove old one if it's there!  
 
-**Configuration**  
-* Configure your PHIBL settings to how you want them to save and click `RightCTRL+S` to save.  
-* Go in `UserData/` and rename the created `temp_PHIBL_MainGame.extdata` to `PHIBL_MainGame.extdata`.  
-* Playing the main game should load the file automatically. If it's missing - it won't be loaded.  
-* To load the preset manually, click `RightCTRL+L`.  
+**Creating a new preset**  
+* Click `RightCTRL+M` to open the PresetLoad UI.  
+* Type in a name for your preset.  
+* Select which scenes you want your preset to autoload on.  
+* Set up your PHIBL settings (F5) and click Save on the PresetLoad UI to save the preset.  
+
+**Editing an existing preset**  
+* Click `RightCTRL+M` to open the PresetLoad UI.  
+* Click `select` on an existing preset.  
+* Change which scenes you want your preset to autoload on.  
+* Set up your PHIBL settings (F5) and click Save on the PresetLoad UI to save the preset.  
+
+**Loading presets manually**  
+* Click `RightCTRL+M` to open the PresetLoad UI.  
+* Click `select` on an existing preset.  
+* Click `Load preset` to load the preset.  
+
+**Loading legacy presets**  
+* Click `RightCTRL+M` to open the PresetLoad UI.  
+* Click `Load legacy preset` to load the legacy preset.  
 
 **Coming soon**  
 * Saving missing settings.  
