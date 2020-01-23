@@ -1,6 +1,8 @@
 # PH_PHIBL_PresetLoad (IPA)
 
-This plugin loads your selected PHIBL settings in the main game for you.  
+This plugin loads your selected PHIBL settings in the main game(1) for you.  
+
+(1) [V1.2.1] You're now able to load/save presets in the studio by using the hotkeys `RightCTRL+S` & `RightCTRL+L`.
 
 **Download**  
 * Get the latest release from https://github.com/Mantas-2155X/PH_PHIBL_PresetLoad/releases  
