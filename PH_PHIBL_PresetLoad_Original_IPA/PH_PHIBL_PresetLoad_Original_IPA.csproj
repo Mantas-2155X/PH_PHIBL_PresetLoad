@@ -24,6 +24,7 @@
     <PlatformTarget>x86</PlatformTarget>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="LegacyLoader.cs" />
     <Compile Include="PH_PHIBL_PresetLoad.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -60,4 +61,5 @@
     </Reference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\SharedProject\SharedProject.projitems" Label="Shared" />
 </Project>

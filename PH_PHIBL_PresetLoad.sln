@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PH_PHIBL_PresetLoad_Nyaacho
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PH_PHIBL_PresetLoad_Original_IPA", "PH_PHIBL_PresetLoad_Original_IPA\PH_PHIBL_PresetLoad_Original_IPA.csproj", "{8757DFCA-1A14-4198-B901-716C14C23AAE}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "SharedProject", "SharedProject\SharedProject.shproj", "{7FB4AE52-0EB9-4354-9916-70D324F5E61D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86

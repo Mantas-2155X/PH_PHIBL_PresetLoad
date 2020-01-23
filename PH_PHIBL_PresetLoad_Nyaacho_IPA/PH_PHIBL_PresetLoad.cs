@@ -1,9 +1,12 @@
 using System;
-using System.IO;
-using System.Reflection;
 using System.Collections;
+using System.IO;
 using System.Linq;
+using System.Reflection;
+using System.Collections.Generic;
+
 using Harmony;
+
 using IllusionPlugin;
 using MessagePack;
 using PHIBL;
@@ -14,7 +17,11 @@ using UnityEngine.SceneManagement;
 namespace PH_PHIBL_PresetLoad
 {
     [MessagePackObject(true)]
-    public class ProfileData {
+    public class PresetInfo
+    {
+        public string name = "preset name";
+        public bool[] scenes = new bool[6];
+        
         public Profile profile;
 
         public float nipples;
@@ -30,76 +37,156 @@ namespace PH_PHIBL_PresetLoad
         public float contributionLUT;
     }
     
+    // ReSharper disable once ClassNeverInstantiated.Global
     public class IPA_PHIBL_PresetLoad : IPlugin
     {
-        public string Name => "PHIBL Preset Load (IPA, for Nyaacho custom PHIBL)";
-        public string Version => "1.2.1";
-        
-        private const KeyCode saveKey = KeyCode.S;
-        private const KeyCode loadKey = KeyCode.L;
+        public string Name => "PHIBL Preset Load (IPA, for xxx PHIBL)";
+        public string Version => "2.0.0";
 
-        private static readonly string[] activeScenes =
-        {
-            "ADVScene",
-            "H",
-            "EditMode",
-            "EditScene",
-            "SelectScene"
-        };
+        public static bool drawUI;
+        private static GameObject uiObj;
+        public static PHIBL.PHIBL phIBL;
+
+        private const KeyCode uiKey = KeyCode.M;
         
-        private static PHIBL.PHIBL phIBL;
+        public static readonly List<PresetInfo> conflicts = new List<PresetInfo>();
+        public static readonly List<PresetInfo> presets = new List<PresetInfo>();
+        public static readonly Dictionary<int, string> scenes = new Dictionary<int, string>
+        {
+            {0, "H"},
+            {1, "ADVScene"},
+            {2, "EditMode"},
+            {3, "EditScene"},
+            {4, "SelectScene"},
+            {5, "Studio"}
+        };
         
         public void OnApplicationStart()
         {
             HarmonyInstance harmony = HarmonyInstance.Create("PHIBL_PresetLoad");
             harmony.PatchAll(Assembly.GetExecutingAssembly());
+            
+            uiObj = new GameObject("PHIBL_PresetLoad_UI");
+            uiObj.AddComponent<PHIBL_PresetLoad_UI>();
+
+            UnityEngine.Object.DontDestroyOnLoad(uiObj);
+            
+            CreateDirectories();
         }
 
-        public void OnUpdate()
+        private static void CreateDirectories()
         {
-            if (phIBL == null)
-                return;
-
-            if (Input.GetKey(KeyCode.RightControl) && Input.GetKeyDown(saveKey))
-                SaveSettings();
-            
-            if (Input.GetKey(KeyCode.RightControl) && Input.GetKeyDown(loadKey))
-                LoadSettings();
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad");
+            Directory.CreateDirectory(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets");
         }
         
-        public void OnLevelWasLoaded(int level) {
-            phIBL = phIBL != null ? phIBL : UnityEngine.Object.FindObjectOfType<PHIBL.PHIBL>();
-            if (phIBL == null) 
-                return;
-            
-            string sceneName = SceneManager.GetActiveScene().name;
-            
-            if (!activeScenes.Contains(sceneName)) 
-                return;
+        private static void SetupPresets()
+        {
+            presets.Clear();
+            conflicts.Clear();
 
-            LoadSettings();
+            string[] files = Directory.GetFiles(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets\\", "*.preset");
+            if (files.Length > 0)
+            {
+                foreach (var filename in files)
+                {
+                    var file = new FileInfo(filename);
+                    if (!file.Exists)
+                        continue;
+
+                    PresetInfo preset = LZ4MessagePackSerializer.Deserialize<PresetInfo>(File.ReadAllBytes(file.FullName), CustomCompositeResolver.Instance);
+                    if (preset != null)
+                        presets.Add(preset);
+                }
+            }
+
+            foreach (var preset in presets)
+            {
+                foreach (var _preset in presets.Where(_preset => preset != _preset))
+                {
+                    for (int i = 0; i < scenes.Count; i++)
+                    {
+                        if (!preset.scenes[i] || !_preset.scenes[i]) 
+                            continue;
+                            
+                        conflicts.Add(preset);
+                        conflicts.Add(_preset);
+
+                        break;
+                    }
+                }
+            }
+            
+            PHIBL_PresetLoad_UI.selectedPreset = -1;
+            PHIBL_PresetLoad_UI.presetName = "preset name";
+            PHIBL_PresetLoad_UI.scenes = new bool[6];
         }
 
-        private static void LoadSettings()
+        private static IEnumerator LoadPresetDelayed(int presetID)
         {
-            if (phIBL == null)
-                return;
+            yield return new WaitForSeconds(1.5f);
 
-            FileInfo file = new FileInfo(@"UserData/PHIBL_MainGame.extdata");
-            if (!file.Exists) 
-                return;
-
-            byte[] bytes = File.ReadAllBytes(file.FullName);
-
-            ProfileData data = LZ4MessagePackSerializer.Deserialize<ProfileData>(bytes, CustomCompositeResolver.Instance);
-            phIBL.StartCoroutine(ApplySettings(data, phIBL));
+            LoadPreset(presetID);
         }
         
-        private static void SaveSettings()
+        public static void LoadPreset(int presetID = -1)
         {
-            if (phIBL == null)
+            PresetInfo preset = presets.ElementAtOrDefault(presetID);
+            if (preset == null)
                 return;
 
+            Profile profile = preset.profile;
+            float nipples = preset.nipples;
+            Traverse traverse = Traverse.Create(phIBL);
+            traverse.Method("LoadPostProcessingProfile", profile).GetValue();
+            DeferredShadingUtils deferredShading = traverse.Field("deferredShading").GetValue<DeferredShadingUtils>();
+            PHIBL.AlloyDeferredRendererPlus SSSSS = deferredShading.SSSSS;
+            Traverse trav = Traverse.Create(SSSSS);
+            trav.Field("TransmissionSettings").SetValue(profile.TransmissionSettings);
+            trav.Field("SkinSettings").SetValue(profile.SkinSettings);
+            trav.Method("Reset").GetValue();
+            traverse.Field("phong").SetValue(profile.phong);
+            traverse.Field("edgelength").SetValue(profile.edgeLength);
+            DeferredShadingUtils.SetTessellation(profile.phong, profile.edgeLength);
+            traverse.Field("nippleSSS").SetValue(nipples);
+            Shader.SetGlobalFloat(Shader.PropertyToID("_AlphaSSS"), nipples);
+            QualitySettings.shadowDistance = preset.shadowDistance;
+            RenderSettings.reflectionBounces = preset.reflectionBounces;
+            ReflectionProbe probe = traverse.Field("probeComponent").GetValue<ReflectionProbe>();
+            probe.resolution = preset.probeResolution;
+            probe.intensity = preset.probeIntensity;
+            
+            if (preset.enabledLUT)
+            {
+                string[] names = traverse.Field("LutFileNames").GetValue<string[]>();
+                if (names.Length >= preset.selectedLUT)
+                {
+                    string path = PHIBL.UserData.Path + "PHIBL/Settings/" + names[preset.selectedLUT] + ".png";
+                    if (File.Exists(path))
+                    {
+                        PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
+                        traverse.Field("selectedUserLut").SetValue(preset.selectedLUT);
+
+                        Texture2D texture2D = new Texture2D(1024, 32, TextureFormat.ARGB32, false, true);
+
+                        byte[] Ldata = File.ReadAllBytes(path);
+                        texture2D.LoadImage(Ldata);
+                        texture2D.filterMode = FilterMode.Trilinear;
+                        texture2D.anisoLevel = 0;
+                        texture2D.wrapMode = TextureWrapMode.Repeat;
+
+                        PPCtrl_obj.userLut.lut = texture2D;
+                        PPCtrl_obj.userLut.contribution = preset.contributionLUT;
+                        PPCtrl_obj.controlUserLut = true;
+                        PPCtrl_obj.enableUserLut = true;
+                    }
+                }
+            }
+            Console.WriteLine("[PHIBL_PresetLoad] Loaded preset: " + presets[presetID].name);
+        }
+
+        public static void SavePreset(bool[] pScenes = null, string name = "preset name")
+        {
             Traverse trav = Traverse.Create(phIBL);
 
             ReflectionProbe probe = trav.Field("probeComponent").GetValue<ReflectionProbe>();
@@ -107,7 +194,10 @@ namespace PH_PHIBL_PresetLoad
 
             PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = trav.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
 
-            ProfileData data = new ProfileData {
+            PresetInfo preset = new PresetInfo
+            {
+                name = name,
+                scenes = pScenes,
                 profile = phIBL.Snapshot(),
                 nipples = trav.Field("nippleSSS").GetValue<float>(),
                 shadowDistance = QualitySettings.shadowDistance,
@@ -119,65 +209,72 @@ namespace PH_PHIBL_PresetLoad
                 contributionLUT = PPCtrl_obj.userLut.contribution
             };
 
-            byte[] bytes = LZ4MessagePackSerializer.Serialize(data, CustomCompositeResolver.Instance);
-            File.WriteAllBytes(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\..\UserData\temp_PHIBL_MainGame.extdata", bytes);
+            File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets\\" + name + ".preset", LZ4MessagePackSerializer.Serialize(preset, CustomCompositeResolver.Instance));
             
-            Console.WriteLine("==============Saved temp_PHIBL_MainGame.extdata==============");
+            SetupPresets();
+            
+            Console.WriteLine("[PHIBL_PresetLoad] Saved preset: " + name);
+        }
+
+        public static void DeletePreset(string name = "preset name")
+        {
+            string path = Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets\\" + name + ".preset";
+            
+            if(File.Exists(path))
+                File.Delete(path);
+            
+            SetupPresets();
         }
         
-        private static IEnumerator ApplySettings(ProfileData data, PHIBL.PHIBL pHIBL) {
-            yield return new WaitForSeconds(1.5f);
-
-            Profile profile = data.profile;
-            float nipples = data.nipples;
-
-            Traverse traverse = Traverse.Create(pHIBL);
-            traverse.Method("LoadPostProcessingProfile", profile).GetValue();
-
-            DeferredShadingUtils deferredShading = traverse.Field("deferredShading").GetValue<DeferredShadingUtils>();
-            PHIBL.AlloyDeferredRendererPlus SSSSS = deferredShading.SSSSS;
-
-            Traverse trav = Traverse.Create(SSSSS);
-            trav.Field("TransmissionSettings").SetValue(profile.TransmissionSettings);
-            trav.Field("SkinSettings").SetValue(profile.SkinSettings);
-            trav.Method("Reset").GetValue();
-
-            traverse.Field("phong").SetValue(profile.phong);
-            traverse.Field("edgelength").SetValue(profile.edgeLength);
-            DeferredShadingUtils.SetTessellation(profile.phong, profile.edgeLength);
-
-            traverse.Field("nippleSSS").SetValue(nipples);
-            Shader.SetGlobalFloat(Shader.PropertyToID("_AlphaSSS"), nipples);
-
-            QualitySettings.shadowDistance = data.shadowDistance;
-            RenderSettings.reflectionBounces = data.reflectionBounces;
-
-            ReflectionProbe probe = traverse.Field("probeComponent").GetValue<ReflectionProbe>();
-            probe.resolution = data.probeResolution;
-            probe.intensity = data.probeIntensity;
-
-            if (data.enabledLUT) {
-                PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
-                traverse.Field("selectedUserLut").SetValue(data.selectedLUT);
-                
-                Texture2D texture2D = new Texture2D(1024, 32, TextureFormat.ARGB32, false, true);
-                byte[] Ldata = File.ReadAllBytes(PHIBL.UserData.Path + "PHIBL/Settings/" + traverse.Field("LutFileNames").GetValue<string[]>()[data.selectedLUT] + ".png");
-                texture2D.LoadImage(Ldata);
-                texture2D.filterMode = FilterMode.Trilinear;
-                texture2D.anisoLevel = 0;
-                texture2D.wrapMode = TextureWrapMode.Repeat;
-
-                PPCtrl_obj.userLut.lut = texture2D;
-                PPCtrl_obj.userLut.contribution = data.contributionLUT;
-                PPCtrl_obj.controlUserLut = true;
-                PPCtrl_obj.enableUserLut = true;
-            }
-
-            Console.WriteLine("==============Loaded PHIBL_MainGame.extdata==============");
+        public void OnUpdate()
+        {
+            if (uiObj == null || !Input.GetKey(KeyCode.RightControl) || !Input.GetKeyDown(uiKey)) 
+                return;
+            
+            if(!drawUI)
+                SetupPresets();
+            
+            drawUI = !drawUI;
         }
 
-        public void OnFixedUpdate() { }
-        public void OnLevelWasInitialized(int level) { }
-        public void OnApplicationQuit() { }
+        public void OnLevelWasLoaded(int level)
+        {
+            drawUI = false;
+            
+            string name = SceneManager.GetActiveScene().name;
+            if (!scenes.ContainsValue(name))
+                return;
+
+            phIBL = phIBL == null ? UnityEngine.Object.FindObjectOfType<PHIBL.PHIBL>() : phIBL;
+            if (phIBL == null) 
+                return;
+
+            SetupPresets();
+            
+            int pID = 0;
+            foreach (var preset in presets)
+            {
+                for (int i = 0; i < scenes.Count; i++)
+                {
+                    if (!preset.scenes[i]) 
+                        continue;
+
+                    if (!scenes.TryGetValue(i, out var pName)) 
+                        continue;
+
+                    if (pName != name) 
+                        continue;
+
+                    phIBL.StartCoroutine(LoadPresetDelayed(pID));
+                    break;
+                }
+
+                pID++;
+            }
+        }
+        
+        public void OnFixedUpdate() {}
+        public void OnLevelWasInitialized(int level) {}
+        public void OnApplicationQuit() {}
     }
 }
