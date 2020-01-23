@@ -42,3 +42,4 @@ If you're updating from a previous version (<2.0.0), to load your old preset fil
 **Currently not saved (wait for next release)**  
 * Misc -> Global Settings -> Screen Shot Size ✕  
 * Lightning -> Reflection -> Refresh Rate ✕  
+* dithering  
