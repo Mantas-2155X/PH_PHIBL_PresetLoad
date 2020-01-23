@@ -40,8 +40,8 @@ namespace PH_PHIBL_PresetLoad
     // ReSharper disable once ClassNeverInstantiated.Global
     public class IPA_PHIBL_PresetLoad : IPlugin
     {
-        public string Name => "PHIBL Preset Load (IPA, for xxx PHIBL)";
-        public string Version => "2.0.0";
+        public string Name => "PHIBL Preset Load (IPA, for original PHIBL)";
+        public string Version => "2.0.1";
 
         public static bool drawUI;
         private static GameObject uiObj;
@@ -155,33 +155,7 @@ namespace PH_PHIBL_PresetLoad
             ReflectionProbe probe = traverse.Field("probeComponent").GetValue<ReflectionProbe>();
             probe.resolution = preset.probeResolution;
             probe.intensity = preset.probeIntensity;
-            
-            if (preset.enabledLUT)
-            {
-                string[] names = traverse.Field("LutFileNames").GetValue<string[]>();
-                if (names.Length >= preset.selectedLUT)
-                {
-                    string path = PHIBL.UserData.Path + "PHIBL/Settings/" + names[preset.selectedLUT] + ".png";
-                    if (File.Exists(path))
-                    {
-                        PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
-                        traverse.Field("selectedUserLut").SetValue(preset.selectedLUT);
 
-                        Texture2D texture2D = new Texture2D(1024, 32, TextureFormat.ARGB32, false, true);
-
-                        byte[] Ldata = File.ReadAllBytes(path);
-                        texture2D.LoadImage(Ldata);
-                        texture2D.filterMode = FilterMode.Trilinear;
-                        texture2D.anisoLevel = 0;
-                        texture2D.wrapMode = TextureWrapMode.Repeat;
-
-                        PPCtrl_obj.userLut.lut = texture2D;
-                        PPCtrl_obj.userLut.contribution = preset.contributionLUT;
-                        PPCtrl_obj.controlUserLut = true;
-                        PPCtrl_obj.enableUserLut = true;
-                    }
-                }
-            }
             Console.WriteLine("[PHIBL_PresetLoad] Loaded preset: " + presets[presetID].name);
         }
 
@@ -190,7 +164,7 @@ namespace PH_PHIBL_PresetLoad
             Traverse trav = Traverse.Create(phIBL);
 
             ReflectionProbe probe = trav.Field("probeComponent").GetValue<ReflectionProbe>();
-            int selectedUserLut = trav.Field("selectedUserLut").GetValue<int>();
+            int selectedUserLut = 0;
 
             PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = trav.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
 
@@ -204,9 +178,9 @@ namespace PH_PHIBL_PresetLoad
                 reflectionBounces = RenderSettings.reflectionBounces,
                 probeResolution = probe.resolution,
                 probeIntensity = probe.intensity,
-                enabledLUT = PPCtrl_obj.enableUserLut,
+                enabledLUT = false,
                 selectedLUT = selectedUserLut,
-                contributionLUT = PPCtrl_obj.userLut.contribution
+                contributionLUT = 0
             };
 
             File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets\\" + name + ".preset", LZ4MessagePackSerializer.Serialize(preset));

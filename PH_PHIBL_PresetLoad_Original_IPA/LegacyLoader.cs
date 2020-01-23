@@ -66,32 +66,6 @@ namespace PH_PHIBL_PresetLoad
             probe.resolution = preset.probeResolution;
             probe.intensity = preset.probeIntensity;
             
-            if (preset.enabledLUT)
-            {
-                string[] names = traverse.Field("LutFileNames").GetValue<string[]>();
-                if (names.Length >= preset.selectedLUT)
-                {
-                    string path = PHIBL.UserData.Path + "PHIBL/Settings/" + names[preset.selectedLUT] + ".png";
-                    if (File.Exists(path))
-                    {
-                        PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
-                        traverse.Field("selectedUserLut").SetValue(preset.selectedLUT);
-
-                        Texture2D texture2D = new Texture2D(1024, 32, TextureFormat.ARGB32, false, true);
-
-                        byte[] Ldata = File.ReadAllBytes(path);
-                        texture2D.LoadImage(Ldata);
-                        texture2D.filterMode = FilterMode.Trilinear;
-                        texture2D.anisoLevel = 0;
-                        texture2D.wrapMode = TextureWrapMode.Repeat;
-
-                        PPCtrl_obj.userLut.lut = texture2D;
-                        PPCtrl_obj.userLut.contribution = preset.contributionLUT;
-                        PPCtrl_obj.controlUserLut = true;
-                        PPCtrl_obj.enableUserLut = true;
-                    }
-                }
-            }
             Console.WriteLine("[PHIBL_PresetLoad] Loaded LEGACY preset");
         }
     }
