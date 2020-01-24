@@ -35,13 +35,15 @@ namespace PH_PHIBL_PresetLoad
         public bool enabledLUT;
         public int selectedLUT;
         public float contributionLUT;
+        
+        public bool enableDithering;
     }
     
     // ReSharper disable once ClassNeverInstantiated.Global
     public class IPA_PHIBL_PresetLoad : IPlugin
     {
         public string Name => "PHIBL Preset Load (IPA, for original PHIBL)";
-        public string Version => "2.0.1";
+        public string Version => "2.0.2";
 
         public static bool drawUI;
         private static GameObject uiObj;
@@ -156,6 +158,9 @@ namespace PH_PHIBL_PresetLoad
             probe.resolution = preset.probeResolution;
             probe.intensity = preset.probeIntensity;
 
+            PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = trav.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
+            PPCtrl_obj.enableDither = preset.enableDithering;
+            
             Console.WriteLine("[PHIBL_PresetLoad] Loaded preset: " + presets[presetID].name);
         }
 
@@ -180,7 +185,8 @@ namespace PH_PHIBL_PresetLoad
                 probeIntensity = probe.intensity,
                 enabledLUT = false,
                 selectedLUT = selectedUserLut,
-                contributionLUT = 0
+                contributionLUT = 0,
+                enableDithering = PPCtrl_obj.enableDither
             };
 
             File.WriteAllBytes(Directory.GetCurrentDirectory() + "\\Plugins\\PHIBL_PresetLoad\\presets\\" + name + ".preset", LZ4MessagePackSerializer.Serialize(preset));

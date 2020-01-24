@@ -25,6 +25,8 @@ namespace PH_PHIBL_PresetLoad
         public bool enabledLUT;
         public int selectedLUT;
         public float contributionLUT;
+
+        public bool enableDithering;
     }
 
     public static class LegacyLoader
@@ -65,6 +67,9 @@ namespace PH_PHIBL_PresetLoad
             ReflectionProbe probe = traverse.Field("probeComponent").GetValue<ReflectionProbe>();
             probe.resolution = preset.probeResolution;
             probe.intensity = preset.probeIntensity;
+
+            var PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
+            PPCtrl_obj.enableDither = preset.enableDithering;
             
             Console.WriteLine("[PHIBL_PresetLoad] Loaded LEGACY preset");
         }

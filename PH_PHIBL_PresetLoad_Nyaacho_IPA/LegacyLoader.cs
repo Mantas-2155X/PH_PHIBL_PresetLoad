@@ -25,6 +25,8 @@ namespace PH_PHIBL_PresetLoad
         public bool enabledLUT;
         public int selectedLUT;
         public float contributionLUT;
+        
+        public bool enableDithering;
     }
 
     public static class LegacyLoader
@@ -67,6 +69,7 @@ namespace PH_PHIBL_PresetLoad
             probe.intensity = preset.probeIntensity;
             
             var PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
+            PPCtrl_obj.enableDither = preset.enableDithering;
             
             if (preset.enabledLUT)
             {
