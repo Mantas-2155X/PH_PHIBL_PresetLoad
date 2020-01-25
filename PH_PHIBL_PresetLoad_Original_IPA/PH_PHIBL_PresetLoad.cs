@@ -158,7 +158,7 @@ namespace PH_PHIBL_PresetLoad
             probe.resolution = preset.probeResolution;
             probe.intensity = preset.probeIntensity;
 
-            PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = trav.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
+            PHIBL.PostProcessing.Utilities.PostProcessingController PPCtrl_obj = traverse.Field("PPCtrl").GetValue<PHIBL.PostProcessing.Utilities.PostProcessingController>();
             PPCtrl_obj.enableDither = preset.enableDithering;
             
             Console.WriteLine("[PHIBL_PresetLoad] Loaded preset: " + presets[presetID].name);
