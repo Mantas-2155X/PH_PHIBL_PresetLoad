@@ -2,6 +2,8 @@
 
 This plugin loads your selected PHIBL settings in the game for you.  
 
+# DO NOT REUPLOAD WITHOUT PERMISSION | 未经许可请勿转载
+
 Presets saved with selected scenes will automatically load when the selected scene is loaded.
 Conflicting presets which are set to load on the same scenes will not automatically load and will be marked.
 
